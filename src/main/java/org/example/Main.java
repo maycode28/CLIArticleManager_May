@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    static int lastArticleId = 0;
+    static int lastArticleId = 3;
     static List<Article> articles = new ArrayList<>();
     static HashMap<String, String> members = new HashMap<>();
     public static void main(String[] args) {
@@ -31,6 +31,10 @@ public class Main {
             }
 
             if (cmd.equals("article write")) {
+                if (signedInMember.isEmpty()){
+                    System.out.println("먼저 로그인이 필요합니다. 로그인 해주세요.");
+                    continue;
+                }
                 System.out.println("==게시글 작성==");
                 int id = lastArticleId + 1;
                 System.out.print("제목 : ");
@@ -40,7 +44,7 @@ public class Main {
                 String regDate = Util.getNowStr();
                 String updateDate = Util.getNowStr();
 
-                Article article = new Article(id, regDate, updateDate, title, body);
+                Article article = new Article(id, regDate, updateDate, title, body,signedInMember);
                 articles.add(article);
 
                 System.out.println(id + "번 글이 작성되었습니다.");
@@ -85,6 +89,10 @@ public class Main {
                 System.out.println("내용 : " + foundArticle.getBody());
 
             } else if (cmd.startsWith("article delete")) {
+                if (signedInMember.isEmpty()){
+                    System.out.println("먼저 로그인이 필요합니다. 로그인 해주세요.");
+                    continue;
+                }
                 System.out.println("==게시글 삭제==");
 
                 int id = Integer.parseInt(cmd.split(" ")[2]);
@@ -94,10 +102,17 @@ public class Main {
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
                     continue;
+                } else if (!signedInMember.equals(foundArticle.getAuthor())) {
+                    System.out.println("게시글의 작성자만 삭제할 수 있습니다.");
+                    continue;
                 }
                 articles.remove(foundArticle);
                 System.out.println(id + "번 게시글이 삭제되었습니다");
             } else if (cmd.startsWith("article modify")) {
+                if (signedInMember.isEmpty()){
+                    System.out.println("먼저 로그인이 필요합니다. 로그인 해주세요.");
+                    continue;
+                }
                 System.out.println("==게시글 수정==");
 
                 int id = Integer.parseInt(cmd.split(" ")[2]);
@@ -106,6 +121,9 @@ public class Main {
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
+                    continue;
+                }else if (!signedInMember.equals(foundArticle.getAuthor())) {
+                    System.out.println("게시글의 작성자만 수정할 수 있습니다.");
                     continue;
                 }
                 System.out.println("기존 title : " + foundArticle.getTitle());
@@ -177,18 +195,16 @@ public class Main {
     }
 
     static void makeTestData() {
-        for (int i = 1; i <= 3; i++) {
-            int id = ++lastArticleId;
-            String title = "Test" + id;
-            String body = "TestTest" + id;
-            String regDate = Util.getNowStr();
-            String updateDate = Util.getNowStr();
-            Article article = new Article(id, regDate, updateDate, title, body);
-            articles.add(article);
-            members.put("abc","123");
-            members.put("def","456");
-            members.put("ghi","789");
-        }
+        Article article = new Article(1, "2025-12-08 12:12:12", "2025-12-08 12:12:12", "Test 1", "TestTest 1","abc");
+        articles.add(article);
+        article = new Article(2,Util.getNowStr() , Util.getNowStr(), "Test 2", "TestTest 2","abc");
+        articles.add(article);
+        article = new Article(3,Util.getNowStr() , Util.getNowStr(), "Test 3", "TestTest 3","def");
+        articles.add(article);
+        members.put("abc","123");
+        members.put("def","456");
+        members.put("ghi","789");
+
 
 
     }
@@ -210,13 +226,15 @@ class Article {
     private String updateDate;
     private String title;
     private String body;
+    private String author;
 
-    public Article(int id, String regDate, String updateDate, String title, String body) {
+    public Article(int id, String regDate, String updateDate, String title, String body, String author) {
         this.id = id;
         this.regDate = regDate;
         this.updateDate = updateDate;
         this.title = title;
         this.body = body;
+        this.author = author;
     }
 
     public int getId() {
@@ -257,6 +275,14 @@ class Article {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
 
