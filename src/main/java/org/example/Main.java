@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Main {
     static int lastArticleId = 3;
     static List<Article> articles = new ArrayList<>();
-    static HashMap<String, String> members = new HashMap<>();
+    static List<Member> members = new ArrayList<>();
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -51,7 +51,7 @@ public class Main {
                 lastArticleId++;
             } else if (cmd.startsWith("article list")) {
                 System.out.println("==게시글 목록==");
-                if (articles.size() == 0) {
+                if (articles.isEmpty()) {
                     System.out.println("아무것도 없음");
                 } else {
                     System.out.println("   번호  /       날짜       /       제목     /   내용  ");
@@ -142,16 +142,16 @@ public class Main {
             }else if (cmd.equals("member join")) {
                 String ID = "";
                 String PW = "";
-                while (true) {
-                    System.out.print("ID : ");
-                    ID = sc.nextLine().trim();
-                    if (members.containsKey(ID)) {
+                System.out.print("ID : ");
+                ID = sc.nextLine().trim();
+                for (Member member : members) {
+                    if (member.getID().equals(ID)) {
                         System.out.println("사용할 수 없는 아이디 입니다.");
-                    } else {
-                        System.out.println("사용할 수 있는 아이디 입니다.");
                         break;
                     }
                 }
+                System.out.println("사용할 수 있는 아이디 입니다.");
+
                 while (true) {
                     System.out.print("PW : ");
                     PW = sc.nextLine().trim();
@@ -163,20 +163,29 @@ public class Main {
                     }
                     break;
                 }
+
                 System.out.println("가입되었습니다.");
-                members.put(ID, PW);
+                members.add(new Member(ID, PW));
             }else if (cmd.equals("member sign in")) {
                 String ID = "";
                 String PW = "";
+                Member foundMember = null;
                 System.out.print("ID : ");
                 ID = sc.nextLine().trim();
-                if (!members.containsKey(ID)) {
+                for (Member member : members) {
+                    if (member.getID().equals(ID)) {
+                        foundMember = member;
+                        break;
+                    }
+                }
+                if  (foundMember == null) {
                     System.out.println("존재하지 않는 아이디입니다.");
                     continue;
                 }
+
                 System.out.print("PW : ");
                 PW = sc.nextLine().trim();
-                if (!members.get(ID).equals(PW)) {
+                if (!foundMember.getPW().equals(PW)) {
                     System.out.println("비밀번호가 잘못 되었습니다.");
                     continue;
                 }
@@ -201,9 +210,9 @@ public class Main {
         articles.add(article);
         article = new Article(3,Util.getNowStr() , Util.getNowStr(), "Test 3", "TestTest 3","def");
         articles.add(article);
-        members.put("abc","123");
-        members.put("def","456");
-        members.put("ghi","789");
+        members.add(new Member("abc","123"));
+        members.add(new Member("def","456"));
+        members.add(new Member("ghi","789"));
 
 
 
@@ -285,5 +294,24 @@ class Article {
         this.author = author;
     }
 
-
+}
+class Member {
+    private String ID;
+    private String PW;
+    public Member (String ID, String PW) {
+        this.ID = ID;
+        this.PW = PW;
+    }
+    public String getID() {
+        return ID;
+    }
+    public void setID(String ID) {
+        this.ID = ID;
+    }
+    public String getPW() {
+        return PW;
+    }
+    public void setPW(String PW) {
+        this.PW = PW;
+    }
 }
