@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class Main {
     static int lastArticleId = 0;
     static List<Article> articles = new ArrayList<>();
+    static HashMap<String, String> members = new HashMap<>();
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -16,7 +17,8 @@ public class Main {
 
         makeTestData();
 
-        HashMap<String, String> members = new HashMap<>();
+        String signedInMember ="";
+
         while (true) {
             System.out.print("명령어 ) ");
             String cmd = sc.nextLine().trim();
@@ -122,7 +124,7 @@ public class Main {
             }else if (cmd.equals("member join")) {
                 String ID = "";
                 String PW = "";
-                while(true){
+                while (true) {
                     System.out.print("ID : ");
                     ID = sc.nextLine().trim();
                     if (members.containsKey(ID)) {
@@ -132,7 +134,7 @@ public class Main {
                         break;
                     }
                 }
-                while (true){
+                while (true) {
                     System.out.print("PW : ");
                     PW = sc.nextLine().trim();
                     System.out.print("PW 확인 : ");
@@ -145,7 +147,27 @@ public class Main {
                 }
                 System.out.println("가입되었습니다.");
                 members.put(ID, PW);
+            }else if (cmd.equals("member sign in")) {
+                String ID = "";
+                String PW = "";
+                System.out.print("ID : ");
+                ID = sc.nextLine().trim();
+                if (!members.containsKey(ID)) {
+                    System.out.println("존재하지 않는 아이디입니다.");
+                    continue;
+                }
+                System.out.print("PW : ");
+                PW = sc.nextLine().trim();
+                if (!members.get(ID).equals(PW)) {
+                    System.out.println("비밀번호가 잘못 되었습니다.");
+                    continue;
+                }
+                System.out.println("로그인 되었습니다.");
+                signedInMember = ID;
 
+            }else if (cmd.equals("member sign out")) {
+                System.out.println("로그아웃 되었습니다.");
+                signedInMember = "";
             } else {
                 System.out.println("사용할 수 없는 명령어입니다");
             }
@@ -163,6 +185,9 @@ public class Main {
             String updateDate = Util.getNowStr();
             Article article = new Article(id, regDate, updateDate, title, body);
             articles.add(article);
+            members.put("abc","123");
+            members.put("def","456");
+            members.put("ghi","789");
         }
 
 
